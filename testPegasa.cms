@@ -1,0 +1,751 @@
+﻿sub(listanie, $prol)
+   LOGWRITE("пролистываение ", $prol, " раз")
+   GETSCREEN
+   COLORMODE(6)
+   IF_PICTURE_IN (0,0, $_xmax,$_ymax, "pap.bmp", -1, 95)
+      move($_return1, $_return2+150)
+      if($prol=1)
+         WHEELDOWN($power_of_prolis)
+         move(150, 150)
+         goto(posle_prolist)
+      end_if
+      if($prol=2 )
+         WHEELDOWN(2*$power_of_prolis)
+         move(150, 150)
+         goto(posle_prolist)
+      end_if
+      
+      if($prol=3 )
+         WHEELDOWN(3*$power_of_prolis)
+         move(150, 150)
+         goto(posle_prolist)
+      end_if
+      if($prol>=4 )
+         GETSCREEN
+         COLORMODE(6)
+         IF_PICTURE_IN (0,0, $_xmax,$_ymax, "refre.bmp", -1, 95)
+            LCLICK($_return1+5, $_return2+5)
+            move($_return1+50, $_return2+50)
+            WAITMS(2000)
+         END_IF
+         $prol=0
+         goto(start)
+      end_if
+      
+      
+      
+   END_IF
+end_sub
+
+
+
+sub(buganie)
+   move(350, 350)
+   WAITMS(1000)
+   WHEELDOWN($power_of_prolis)
+   
+   $bug=$bug+1
+   LOGWRITE("не увидел что ожидал увидить уже ", $bug, " раз")
+   if($bug>=$sbug)
+      
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax, "refre.bmp", -1, 95)
+         LCLICK($_return1+5, $_return2+5)
+         move($_return1+50, $_return2+50)
+         WAITMS(2000)
+         //         LCLICK($_return1+5, $_return2+5)
+         //         move($_return1+50, $_return2+50)
+         //         WAITMS(2000)
+         //         LCLICK($_return1+5, $_return2+5)
+         //         move($_return1+50, $_return2+50)
+         //         WAITMS(2000)
+         //         LCLICK($_return1+5, $_return2+5)
+         //         move($_return1+50, $_return2+50)
+         //         WAITMS(2000)
+         //         LCLICK($_return1+5, $_return2+5)
+         //         move($_return1+50, $_return2+50)
+         //         WAITMS(2000)
+         goto(start)
+      ELSE
+         WAITMS(50)
+      END_IF
+   end_if
+end_sub
+
+
+
+
+sub(cyc_pegasov)
+   
+   GETSCREEN
+   COLORMODE(6)
+   SCANPICTURE($ARR_SCAN, 0,0, $_xmax,$_ymax, "6666.bmp", -1, 90)
+   
+   $ARR_NUM = 0
+   $kol_vo_pegaxy_for_display=ARRSIZE($ARR_SCAN)/2
+   LOGWRITE("нашел других коней ",$kol_vo_pegaxy_for_display, " штук" )
+   WHILE ($ARR_NUM < ARRSIZE($ARR_SCAN))
+      
+      
+      $X = $ARR_SCAN [$ARR_NUM]
+      INC($ARR_NUM,1)
+      $Y = $ARR_SCAN [$ARR_NUM]
+      INC($ARR_NUM,1)
+      WAITMS(500)
+      LCLICK($X, $Y)
+      WAITMS(500)
+      LCLICK($X, $Y)
+      print("кликнул но нового коня")
+      //               $endgame=$endgame+1
+      
+      move(150,150)
+      WAITMS(5000)
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax, "ok.bmp", -1, 95)
+         LCLICK($_return1+5, $_return2+5)
+         move($_return1+50, $_return2+50)
+         WAITMS(2000)
+      END_IF
+      
+      $test_2_cyc=0
+      FOR ($nomer=0,$nomer<1)
+         
+         GETSCREEN
+         COLORMODE(6)
+         IF_PICTURE_IN (0,0, $_xmax,$_ymax, StrConcat ($nomer,"25.bmp"), -1, 95)
+            
+            LOGWRITE("нашел ",StrConcat ($nomer,"/25")," энергии значит коня на убой")
+            $test_2_cyc=1
+         else
+            LOGWRITE("не нашел ",StrConcat ($nomer,"/25")," энергии значит конь ещё может жить")
+         end_if
+      end_cyc
+      
+      
+      if ($test_2_cyc=1)
+         print("данный конь оказался забракованным, пускайте его на мясо")
+      else
+         $check = 0
+         WHILE($check = 0)
+            GETSCREEN
+            COLORMODE(6)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, "кнопкаСтарт.bmp", -1, 95)
+               $check = 1
+               move($_return1, $_return2)
+               WAITMS(500)
+               LCLICK($_return1, $_return2)
+               print("Нажал на начать гонку")
+               move(100, 100)
+               WAITMS(100)
+               
+            ELSE
+               buganie()
+               print("Хотел нажать на начать гонку но не нашел внутри цикла")
+            END_IF
+         END_CYC
+         
+         $check = 0
+         WHILE($check = 0)
+            GETSCREEN
+            COLORMODE(6)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, "ЕТА.bmp", -1, 95)
+               $check = 1
+               
+               goto(jopa)
+               print("Поиск пошел")
+               WAITMS(100)
+            ELSE
+               
+               WAITMS(50)
+               print("поиск не пошел")
+               GETSCREEN
+               COLORMODE(6)
+               IF_PICTURE_IN (0,0, $_xmax,$_ymax, "found.bmp", -1, 95)
+                  $check = 1
+                  print("увидел что матч найден1")
+                  goto(good)
+               ELSE
+                  
+                  GETSCREEN
+                  COLORMODE(6)
+                  IF_PICTURE_IN (0,0, $_xmax,$_ymax, "релоад.bmp", -1, 95)
+                     LCLICK($_return1, $_return2)
+                     print("нажал на релоад1")
+                     MOVE($_return1-50, $_return2-50)
+                     
+                  ELSE
+                     
+                     buganie()
+                  END_IF
+                  
+                  
+                  GETSCREEN
+                  COLORMODE(6)
+                  IF_PICTURE_IN (0,0, $_xmax,$_ymax, "закончилась.bmp", -1, 95)
+                     print("ТА ФИГНЯ ЧТО ХОЧУ ЗАКОММЕНТИТЬ")
+                     $check = 1
+                     LCLICK($_return1, $_return2)
+                     $endgame=$endgame+1
+                     if($endgame=$sendgame)
+                        halt
+                     end_if
+                     WAITMS(100)
+                  ELSE
+                     WAITMS(50)
+                  END_IF
+               END_IF
+            END_IF
+         END_CYC
+         
+      END_IF
+      
+      
+      
+   END_CYC
+   
+   UNDEFINE($ARR_SCAN)
+end_sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//$check = 0
+//WHILE($check = 0)
+//   GETSCREEN
+//   COLORMODE(6)
+//   IF_PICTURE_IN (0,0, $_xmax,$_ymax, "ВыборПегаса.bmp", -1, 90)
+//      $check = 1
+//      LCLICK($_return1, $_return2)
+//      move(50,50)
+//      WAITMS(2000)
+//   ELSE
+//      WAITMS(50)
+//   END_IF
+//END_CYC
+//print("Нажал на выбрать пегаса")
+
+$sbug=10
+$sendgame=6
+$power_of_prolis=17
+$prol=0
+$bug=0
+$endgame =0
+while($endgame ! 3)
+   
+   
+   start:
+   GETSCREEN
+   COLORMODE(6)
+   IF_PICTURE_IN (0,0, $_xmax,$_ymax, "sttt.bmp", -1, 95)
+      LCLICK($_return1, $_return2)
+      move(50, 50)
+      WAITMS(2000)
+   END_IF
+   
+   
+   move(350, 350)
+   WHEELDOWN($power_of_prolis)
+   WAITMS(5000)
+   GETSCREEN
+   COLORMODE(6)
+   IF_PICTURE_IN (0,0, $_xmax,$_ymax, "ok.bmp", -1, 95)
+      LCLICK($_return1+5, $_return2+5)
+      move($_return1+50, $_return2+50)
+      WAITMS(2000)
+   END_IF
+   
+   
+   
+   print("начало цикла")
+   //   тут проверяется можно ли нажать на кнопку старт
+   $check_s = 0
+   WHILE($check_s = 0)
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax, "6666.bmp", -1, 90)
+         $check_s = 1
+      ELSE
+         GETSCREEN
+         COLORMODE(6)
+         IF_PICTURE_IN (0,0, $_xmax,$_ymax, "следматч.bmp", -1, 90)
+            
+            
+            MOVE($_return1, $_return2)
+            WAITMS(100)
+            LCLICK($_return1, $_return2)
+            print("нажал на след матч")
+            WAITMS(100)
+            
+            
+         else
+            GETSCREEN
+            COLORMODE(6)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, "лоадинг.bmp", -1, 100)
+               GETSCREEN
+               COLORMODE(6)
+               IF_PICTURE_IN (0,0, $_xmax,$_ymax, "refre.bmp", -1, 95)
+                  $bug=0
+                  
+                  LCLICK($_return1+5, $_return2+5)
+                  move($_return1+50, $_return2+50)
+                  WAITMS(2000)
+                  goto(start)
+               ELSE
+                  WAITMS(50)
+               END_IF
+            ELSE
+               
+               
+               buganie()
+               
+            END_IF
+            
+         END_IF
+      END_IF
+   END_CYC
+   
+   
+   //   тут пролистываются кони и ищутся полные, если их нет идём наверх
+   GETSCREEN
+   COLORMODE(6)
+   IF_PICTURE_IN (0,0, $_xmax,$_ymax, "2525.bmp", -1, 95)
+      LCLICK($_return1+10, $_return2+10)
+      print("кликнул на 25 25")
+      
+   else
+      
+      print("буду искать пап")
+      $test_down=0
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax, "pap.bmp", -1, 95)
+         $xpap= $_return1
+         $ypap= $_return2
+         print("нашел пап")
+         
+         
+         
+         FOR($a=0, $a < 2)
+            move($xpap, $ypap+150)
+            WHEELDOWN($power_of_prolis)
+            move(100, 150)
+            WAITMS(500)
+            
+            
+            FOR ($nomer=25,$nomer<26)
+               GETSCREEN
+               COLORMODE(6)
+               IF_PICTURE_IN (0,0, $_xmax,$_ymax, StrConcat ($nomer,"25.bmp") , -1, 95)
+                  LCLICK($_return1+10, $_return2+10)
+                  print("кликнул на 25 25")
+                  $test_down=1
+                  $a=5
+               else
+                  LOGWRITE("не нашел ",StrConcat ($nomer,"/25")," энергии")
+               END_IF
+               
+            end_cyc
+            
+         END_CYC
+         
+         IF($test_down=0 )
+            move($xpap, $ypap+150)
+            WHEELUP(100)
+            
+         end_if
+         
+         
+         print("пролистал 5 раз коней")
+      END_IF
+   END_IF
+   WAITMS(5000)
+   posle_prolist:
+   $gon=0
+   $endgame=0
+   $bug=0
+   $check = 0
+   //   в этом цикле мы хотим нажать на старт и в итоге на неё нажимаем
+   WHILE($check = 0)
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax, "кнопкаСтарт.bmp", -1, 95)
+         $check = 1
+         $test_2_cyc=0
+         FOR ($nomer=0,$nomer<1)
+            
+            GETSCREEN
+            COLORMODE(6)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, StrConcat ($nomer,"25.bmp"), -1, 100)
+               
+               LOGWRITE("нашел ",StrConcat ($nomer,"/25")," энергии значит коня на убой")
+               $test_2_cyc=1
+            else
+               LOGWRITE("не нашел ",StrConcat ($nomer,"/25")," энергии значит конь ещё может жить")
+            end_if
+         end_cyc
+         if ($test_2_cyc=1)
+            goto(kostil)
+         end_if
+         move($_return1, $_return2)
+         WAITMS(500)
+         LCLICK($_return1, $_return2)
+         move(100, 100)
+         print("Нажал на начать гонку")
+         WAITMS(100)
+      ELSE
+         WAITMS(50)
+         print("Хотел нажать на начать гонку но не нашел")
+         
+         buganie()
+         
+         IF_PICTURE_IN (0,0, $_xmax,$_ymax, "следматч.bmp", -1, 95)
+            print("11111111111111111111111111111111111111111")
+            
+            MOVE($_return1, $_return2)
+            WAITMS(500)
+            LCLICK($_return1, $_return2)
+            print("нажал на след матч")
+            GOTO(start)
+            WAITMS(100)
+         ELSE
+            print("22222222222222222222222222222222222222222222")
+            GETSCREEN
+            COLORMODE(6)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, "неуспели.bmp", -1, 95)
+               print("не успел на матч и начинаю заново")
+               LCLICK($_return1, $_return2)
+               goto(jopa)
+            ELSE
+               print("33333333333333333333333333333333333333")
+               
+               
+               GETSCREEN
+               COLORMODE(6)
+               IF_PICTURE_IN (0,0, $_xmax,$_ymax, "кнопкаСтарт.bmp", -1, 95)
+                  GOTO(start)
+               ELSE
+                  WAITMS(50)
+               END_IF
+            END_IF
+         END_IF
+      END_IF
+   END_CYC
+   
+   //странный цикл в начале ищем ЕТА если он есть то выходим
+   $check = 0
+   WHILE($check = 0)
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax, "ЕТА.bmp", -1, 95)
+         print("Теперь точно знаю что поиск начался")
+         $check = 1
+      ELSE
+         print("в процессе поиска того что начался поиск")
+         GETSCREEN
+         COLORMODE(6)
+         IF_PICTURE_IN (0,0, $_xmax,$_ymax, "закончилась.bmp", -1, 95)
+            print("Теперь точно знаю что пегас пуст")
+            LCLICK($_return1, $_return2)
+            WAITMS(1000)
+            kostil:
+            cyc_pegasov()
+            $prol=$prol+1
+            listanie($prol)
+         ELSE
+            print("просто продолжаю ждать начала поиска")
+            
+            buganie()
+            GETSCREEN
+            COLORMODE(6)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, "кнопкаСтарт.bmp", -1, 95)
+               print("можно нажать на кнопку старт")
+               GOTO(start)
+            end_if
+            GETSCREEN
+            COLORMODE(6)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, "found.bmp", -1, 95)
+               $check = 1
+               print("увидел что матч найден2")
+               goto(good)
+            ELSE
+               GETSCREEN
+               COLORMODE(6)
+               IF_PICTURE_IN (0,0, $_xmax,$_ymax, "релоад.bmp", -1, 95)
+                  LCLICK($_return1, $_return2)
+                  print("нажал на релоад1")
+                  MOVE($_return1-50, $_return2-50)
+               ELSE
+                  WAITMS(50)
+               END_IF
+               WAITMS(50)
+            END_IF
+         END_IF
+      END_IF
+   END_CYC
+   jopa:
+   $check = 0
+   WHILE($check = 0)
+      
+      
+      
+      
+      
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax, "found.bmp", -1, 95)
+         $check = 1
+         print("увидел что матч найден3")
+         
+      ELSE
+         GETSCREEN
+         COLORMODE(6)
+         IF_PICTURE_IN (0,0, $_xmax,$_ymax, "релоад.bmp", -1, 95)
+            LCLICK($_return1, $_return2)
+            print("нажал на релоад2")
+            MOVE($_return1-50, $_return2-50)
+            
+         ELSE
+            GETSCREEN
+            COLORMODE(6)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, "ЕТА.bmp", -1, 95)
+               print("Теперь точно знаю что поиск начался но счётчик не остановлю")
+               
+            END_IF
+            
+            
+            
+            buganie()
+         END_IF
+         
+         
+         WAITMS(50)
+      END_IF
+   END_CYC
+   good:
+   
+   
+   
+   
+   
+   
+   
+   
+   $check = 0
+   WHILE($check = 0)
+      
+      
+      
+      
+      
+      $metacheck = 0
+      WHILE($metacheck < 5)
+         GETSCREEN
+         COLORMODE(6)
+         IF_PICTURE_IN (0,0, $_xmax,$_ymax, "подписька.bmp", -1, 95)
+            LCLICK($_return1+3, $_return2+3)
+            move(150,150)
+            $check = 1
+         else
+            $metacheck =$metacheck +1
+            
+         END_IF
+      END_CYC
+      
+      
+      $bug=$bug+1
+      print($bug)
+      if($bug>=$sbug)
+         
+         GETSCREEN
+         COLORMODE(6)
+         IF_PICTURE_IN (0,0, $_xmax,$_ymax, "refre.bmp", -1, 95)
+            
+            
+            LCLICK($_return1+5, $_return2+5)
+            move($_return1+50, $_return2+50)
+            WAITMS(2000)
+            goto(start)
+         ELSE
+            halt
+         END_IF
+         
+      END_IF
+   END_CYC
+   
+   
+   
+   print("вот тут я есть ")
+   
+   
+   
+   
+   
+   $check = 0
+   WHILE($check = 0)
+      
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax, "гонка.bmp", -1, 90)
+         print("зуб даю гонка")
+         WAITMS(5000)
+         $gon=$gon+1
+         if($gon>=20)
+            GETSCREEN
+            COLORMODE(6)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, "refre.bmp", -1, 95)
+               LCLICK($_return1+5, $_return2+5)
+               move($_return1+50, $_return2+50)
+               WAITMS(2000)
+               goto(start)
+            ELSE
+               halt
+            END_IF
+         end_if
+         print($gon)
+         
+         
+         
+      ELSE
+         
+         
+         
+         
+         
+         GETSCREEN
+         COLORMODE(6)
+         IF_PICTURE_IN (0,0, $_xmax,$_ymax, "следматч.bmp", -1, 90)
+            $check = 1
+            MOVE($_return1, $_return2)
+            WAITMS(100)
+            LCLICK($_return1, $_return2)
+            print("нажал на след матч")
+            WAITMS(100)
+         ELSE
+            GETSCREEN
+            COLORMODE(6)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, "неуспели.bmp", -1, 95)
+               print("не успел на матч и начинаю заново")
+               LCLICK($_return1, $_return2)
+               goto(jopa)
+            ELSE
+               GETSCREEN
+               COLORMODE(6)
+               IF_PICTURE_IN (0,0, $_xmax,$_ymax, "кнопкаСтарт.bmp", -1, 95)
+                  print("увидел что что то пропустил но уже можно нажать на кнопку старт")
+                  GOTO(start)
+               ELSE
+                  GETSCREEN
+                  COLORMODE(6)
+                  IF_PICTURE_IN (0,0, $_xmax,$_ymax, "джоин.bmp", -1, 95)
+                     print("должна быть гонка а я вижу надпись джоин, рефрешаю")
+                     GETSCREEN
+                     COLORMODE(6)
+                     IF_PICTURE_IN (0,0, $_xmax,$_ymax, "refre.bmp", -1, 95)
+                        LCLICK($_return1+5, $_return2+5)
+                        move($_return1+50, $_return2+50)
+                        print("рефрешнул")
+                        WAITMS(2000)
+                     ELSE
+                        WAITMS(50)
+                        print("бред ибо как не может быть рефреша")
+                     END_IF
+                  ELSE
+                     GETSCREEN
+                     COLORMODE(6)
+                     IF_PICTURE_IN (0,0, $_xmax,$_ymax, "found.bmp", -1, 95)
+                        print("должна быть гонка а я вижу надпись фаунд, рефрешаю")
+                        GETSCREEN
+                        COLORMODE(6)
+                        IF_PICTURE_IN (0,0, $_xmax,$_ymax, "refre.bmp", -1, 95)
+                           LCLICK($_return1+5, $_return2+5)
+                           move($_return1+50, $_return2+50)
+                           print("рефрешнул")
+                           WAITMS(2000)
+                        ELSE
+                           WAITMS(50)
+                           print("бред ибо как не может быть рефреша")
+                        END_IF
+                     ELSE
+                        GETSCREEN
+                        COLORMODE(6)
+                        IF_PICTURE_IN (0,0, $_xmax,$_ymax, "релоад.bmp", -1, 95)
+                           GETSCREEN
+                           COLORMODE(6)
+                           IF_PICTURE_IN (0,0, $_xmax,$_ymax, "refre.bmp", -1, 95)
+                              LCLICK($_return1+5, $_return2+5)
+                              move($_return1+50, $_return2+50)
+                              WAITMS(2000)
+                              goto(start)
+                           ELSE
+                              halt
+                           END_IF
+                        ELSE
+                           GETSCREEN
+                           COLORMODE(6)
+                           IF_PICTURE_IN (0,0, $_xmax,$_ymax, "лоадинг.bmp", -1, 90)
+                              GETSCREEN
+                              COLORMODE(6)
+                              IF_PICTURE_IN (0,0, $_xmax,$_ymax, "refre.bmp", -1, 95)
+                                 LCLICK($_return1+5, $_return2+5)
+                                 move($_return1+50, $_return2+50)
+                                 WAITMS(2000)
+                                 goto(start)
+                              ELSE
+                                 WAITMS(50)
+                              END_IF
+                           ELSE
+                              
+                              
+                              buganie()
+                           END_IF
+                        END_IF
+                     END_IF
+                  END_IF
+               END_IF
+            END_IF
+         END_IF
+      END_IF
+   END_CYC
+   print("конец цикла")
+   GOTO(start)
+END_CYC
+
+
+
+
+
+
+
+
+halt

@@ -1,0 +1,449 @@
+﻿SUB(mouse_move,$MOVE_END_X,$MOVE_END_Y)
+   $MOVE_SPEED = 200  // множитель скорости
+   
+   $MOVE_Start_X = $_xmouse
+   $MOVE_Start_Y = $_ymouse
+   $MOVE_X = $MOVE_Start_X
+   $MOVE_Y = $MOVE_Start_Y
+   
+   $dist = DIST($MOVE_END_X,$MOVE_END_Y,$MOVE_Start_X,$MOVE_Start_Y)
+   
+   $MOVE_SPEEDVAR = INT((SQRT($dist))/$MOVE_SPEED)
+   
+   IF($MOVE_SPEEDVAR < 1)
+      $MOVE_SPEEDVAR = 1
+   END_IF
+   
+   $MOVE_step=($dist-1)/$MOVE_SPEEDVAR
+   $MOVE_X_step = ($MOVE_END_X-$MOVE_Start_X)/$MOVE_step
+   $MOVE_Y_step = ($MOVE_END_Y-$MOVE_Start_Y)/$MOVE_step
+   
+   FOR($MOVE_i, $MOVE_i<INT($MOVE_step))
+      $MOVE_X = $MOVE_X + $MOVE_X_step
+      $MOVE_Y = $MOVE_Y + $MOVE_Y_step
+      MOVE(ROUND($MOVE_X,0), ROUND($MOVE_Y,0))
+      WAITMS(1)
+   END_CYC
+   
+   MOVE($MOVE_END_X, $MOVE_END_Y)		//Передвинуть окончательно в заданную точку
+END_SUB
+
+
+
+
+
+
+
+SUB(ПоискКарт)
+   getscreen
+   COLORMODE(6)
+   // поиск изображения pict.bmp в области 0,0 - 1250,959
+   scanpicture($var, 0,0, $_xmax,$_ymax, "1энергия.bmp",-1,50)
+   // вывод массива, содержащего результаты поиска
+   $k=8
+   while (arrsize($var) > 0 and $null_energy = 0 and $k!=0)
+      $y = arrpop($var)
+      $x = arrpop($var)
+      $null_energy = 0
+      mouse_move($x+10,$y+30)
+      WAITMS(750)
+      
+      LCLICK($x+10,$y+30)
+      $k=$k-1
+      WAIT(1)
+   end_cyc
+END_SUB
+
+SUB(ПроверкаВремени)
+   EXECUTE("cmd.exe","/C time /t >TIME.txt")
+   WAIT(2)
+   $chas=(strcut(StrReadln("TIME.txt",1), 1, 2 ))
+   if(strcut($chas, 1, 1 )=0)
+      $chas=strcut($chas, 1, 2 )
+   end_if
+   $minute=(strcut(StrReadln("TIME.txt",1), 4, 2 ))
+   if($chas=2 and $minute>=40)
+      EXECUTE("cmd.exe","/C hostname >KompName.txt")
+      $url = "https://api.telegram.org/bot950940715:AAFy0d1stHb45OhKoufE607oHm9zzCnwSrc/sendMessage?chat_id=-1001360890249&text="
+      $text = StrConcat("yze 2 50 ",StrReadln("KompName.txt",1))
+      
+      
+      EXECUTE("cmd.exe", STRCONCAT("/C curl ", CHAR(34), $url, $text, CHAR(34)))
+      GOTO(end)
+   END_IF
+END_SUB
+
+
+SUB(Проверки)
+   
+   if ($slp=1)
+      
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax, "5050.bmp", -1, 98)
+         // если тут  вместо 1,1 написать $_xmax,$_ymax то он будет выходить после 50 слп
+         // если же не менять то будет играть вечно ( к примеру так можно на ночь поставить что бы он босса убить пытался
+         print("нашел что слп набиты ")
+         GOTO(end)
+         
+      END_IF
+      print("зашел в слп и не нашел их ")
+   END_IF
+   
+   if ($energy=1)
+      
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax, "0energy.bmp", -1, 98)
+         print("нашел что энергия кончилась ")
+         GOTO(end)
+         
+      END_IF
+      print("зашел в энергию и не нашел их ")
+   END_IF
+   
+   
+   if ($time=1)
+      ПроверкаВремени()
+      print("зашел в время и не нашел их ")
+   END_IF
+   
+END_SUB
+
+
+
+
+
+
+
+sub(КликНаУровень)
+   
+   
+   GETSCREEN
+   COLORMODE(6)
+   IF_PICTURE_IN (0,0, $_xmax,$_ymax,  "лево.bmp", -1, 80)
+      print("клик лево")
+      
+      
+      mouse_move($_return1, $_return2)
+      WAITMS(100)
+      LCLICK($_return1, $_return2)
+      WAITMS(500)
+      LCLICK($_return1, $_return2)
+      
+      
+   END_IF
+   
+   
+   if ($lvl>=12 )
+      
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax,  "право.bmp", -1, 80)
+         print("клик право")
+         
+         
+         mouse_move($_return1, $_return2)
+         WAITMS(100)
+         LCLICK($_return1, $_return2)
+         WAITMS(500)
+         LCLICK($_return1, $_return2)
+         
+         
+      END_IF
+      
+   end_if
+   
+   
+   
+   WAITMS(500)
+   GETSCREEN
+   COLORMODE(6)
+   IF_PICTURE_IN (0,0, $_xmax,$_ymax, StrConcat($lvl, "lvl.bmp"), -1, 90)
+      print("нашел нужный уровень")
+      
+      WAITMS(300)
+      mouse_move($_return1, $_return2)
+      WAITMS(100)
+      LCLICK($_return1+20, $_return2+20)
+      
+   else
+      print("не нашел нужный уровень")
+   END_IF
+   
+   
+   GETSCREEN
+   COLORMODE(6)
+   IF_PICTURE_IN (0,0, $_xmax,$_ymax,  "лево.bmp", -1, 80)
+      print("клик право")
+      
+      
+      mouse_move($_return1, $_return2)
+      WAITMS(100)
+      LCLICK($_return1, $_return2)
+      WAITMS(500)
+      LCLICK($_return1, $_return2)
+      
+      
+   END_IF
+   
+   
+end_sub
+
+
+$time = RADIOBOX("рубиться в 2 50?","1","0")
+$slp = RADIOBOX("Остановиться после 50 слп?","1","0")
+$mastur = RADIOBOX("дрочиться на 1 уровне?","1","0")
+$energy =  RADIOBOX("После 20 энергии выйти?","1","0")
+print("привет ")
+
+
+
+EXECUTE("cmd.exe","/C hostname >KompName.txt")
+$url = "https://api.telegram.org/bot950940715:AAFy0d1stHb45OhKoufE607oHm9zzCnwSrc/sendMessage?chat_id=-1001360890249&text="
+$text = StrConcat("nachal ",StrReadln("KompName.txt",1))
+
+
+EXECUTE("cmd.exe", STRCONCAT("/C curl ", CHAR(34), $url, $text, CHAR(34)))
+
+
+
+
+
+
+$lvl = RADIOBOX("Выберете уровень","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21")
+
+
+
+skip:
+
+
+GETSCREEN
+COLORMODE(6)
+IF_PICTURE_IN (0,0, $_xmax,$_ymax, "ошибкадискон.bmp", -1, 95)
+   print("кликаю на сообщение об ошибке ")
+   $url = "https://api.telegram.org/bot950940715:AAFy0d1stHb45OhKoufE607oHm9zzCnwSrc/sendMessage?chat_id=-1001360890249&text="
+   $text = StrConcat("klick on error button ",StrReadln("KompName.txt",1))
+   
+   
+   EXECUTE("cmd.exe", STRCONCAT("/C curl ", CHAR(34), $url, $text, CHAR(34)))
+   
+   mouse_move($_return1, $_return2)
+   WAITMS(750)
+   mouse_move($_return1, $_return2)
+   WAIT(2)
+   mouse_move($_return1+5, $_return2+5)
+   LCLICK($_return1+5, $_return2+5)
+   
+   
+   WAITMS(100)
+END_IF
+
+
+
+GETSCREEN
+COLORMODE(6)
+IF_PICTURE_IN (0,0, $_xmax,$_ymax, "назад.bmp", -1, 90)
+   print("выхожу в меню ")
+   mouse_move($_return1, $_return2)
+   WAITMS(750)
+   LCLICK($_return1, $_return2)
+   
+   
+   WAITMS(100)
+END_IF
+
+GETSCREEN
+COLORMODE(6)
+IF_PICTURE_IN (0,0, $_xmax,$_ymax, "началоигры.bmp", -1, 90)
+   print("захожу в игру")
+   mouse_move($_return1, $_return2)
+   WAITMS(750)
+   LCLICK($_return1, $_return2)
+   
+   WAITMS(100)
+END_IF
+
+
+
+
+
+КликНаУровень()
+
+
+
+
+
+
+
+
+
+print("готов начать играть ")
+$check1 = 0
+WHILE($check1 = 0)
+   GETSCREEN
+   COLORMODE(6)
+   IF_PICTURE_IN (0,0, $_xmax,$_ymax, "полмонстра.bmp", -1, 90)
+      Проверки()
+      print("нашел точку опоры ввиду куска монстра ")
+      print("ищу стар уровня ")
+      $monstrx=$_return1
+      $monstry=$_return2
+      GETSCREEN
+      COLORMODE(6)
+      IF_PICTURE_IN (0,0, $_xmax,$_ymax, "стартуровня111.bmp", -1, 90)
+         print("зашел в уровень ")
+         mouse_move($_return1,$_return2)
+         WAITMS(500)
+         LCLICK($_return1, $_return2)
+         WAIT(10)
+         $check = 0
+         $checkEXIT=0
+         WHILE($check = 0)
+            GETSCREEN
+            COLORMODE(7)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, "конецхода.bmp", -1, 100)
+               print("понял что мой ход ")
+               ПоискКарт()
+               $check = 1
+               mouse_move($_return1, $_return2)
+               WAIT(2)
+               mouse_move($_return1+5, $_return2+5)
+               LCLICK($_return1+5, $_return2+5)
+               
+               
+               WAITMS(100)
+            ELSE
+               print("или не мой ход или надо заново заходить на уровень")
+               $checkEXIT=$checkEXIT+1
+               IF($checkEXIT>=10)
+                  print("аж 5 раз не нашел кнопку моего хода значит надо начинать играть заново ")
+                  GOTO(skip)
+               END_IF
+               mouse_move($monstrx, $monstry)
+               LCLICK($monstrx, $monstry)
+               mouse_move($monstrx+100, $monstry+100)
+               IF_PICTURE_IN (0,0, $_xmax,$_ymax, "полмонстра.bmp", -1, 90)
+                  $check = 1
+               END_IF
+               WAITMS(50)
+            END_IF
+         END_CYC
+         WAITMS(50)
+      ELSE
+         print("не нашел кнопки старта уровня но вижу монстра. ну нахер лучше перезайти ")
+         
+         
+         GOTO(skip)
+      END_IF
+   else
+      print("ага перезашел и нет монстра, возможно я на уровне долго втыкал, попробую найти кнопку моего хода ")
+      $check = 0
+      $checkEXIT=0
+      WHILE($check = 0)
+         GETSCREEN
+         COLORMODE(7)
+         IF_PICTURE_IN (0,0, $_xmax,$_ymax, "конецхода.bmp", -1, 100)
+            print("ага мой ход ")
+            $null_energy = 0
+            $checkEXIT=0
+            ПоискКарт()
+            $check = 1
+            mouse_move($_return1, $_return2)
+            WAIT(2)
+            mouse_move($_return1+5, $_return2+5)
+            LCLICK($_return1+5, $_return2+5)
+            
+         ELSE
+            print("или ход врага или пора перезайти")
+            $checkEXIT=$checkEXIT+1
+            IF($checkEXIT>=10)
+               
+               if($mastur=1)
+                  GOTO(skip)
+               else
+                  
+                  $check = 1
+                  
+               end_if
+               
+            END_IF
+            mouse_move($monstrx, $monstry)
+            LCLICK($monstrx, $monstry)
+            mouse_move($monstrx+100, $monstry+100)
+            
+            WAITMS(50)
+            GETSCREEN
+            COLORMODE(6)
+            IF_PICTURE_IN (0,0, $_xmax,$_ymax, "полмонстра.bmp", -1, 90)
+               $check = 1
+            END_IF
+            
+         END_IF
+      END_CYC
+      WAITMS(50)
+   END_IF
+END_CYC
+
+
+
+
+end:
+
+EXECUTE("cmd.exe","/C hostname >KompName.txt")
+$url = "https://api.telegram.org/bot950940715:AAFy0d1stHb45OhKoufE607oHm9zzCnwSrc/sendMessage?chat_id=-1001360890249&text="
+$text = StrConcat("gotovo ",StrReadln("KompName.txt",1))
+
+
+EXECUTE("cmd.exe", STRCONCAT("/C curl ", CHAR(34), $url, $text, CHAR(34)))
+
+GETSCREEN
+COLORMODE(6)
+IF_PICTURE_IN (0,0, $_xmax,$_ymax, "назад.bmp", -1, 90)
+   print("идём в меню ")
+   mouse_move($_return1, $_return2)
+   WAITMS(750)
+   LCLICK($_return1, $_return2)
+   
+   
+   WAITMS(100)
+END_IF
+
+
+GETSCREEN
+COLORMODE(6)
+IF_PICTURE_IN (0,0, $_xmax,$_ymax, "квест.bmp", -1, 90)
+   print("попробуем заработать ещё 25 ")
+   mouse_move($_return1, $_return2)
+   WAIT(3)
+   LCLICK($_return1, $_return2)
+   WAIT(3)
+   
+   WAITMS(100)
+END_IF
+GETSCREEN
+COLORMODE(6)
+IF_PICTURE_IN (0,0, $_xmax,$_ymax, "чек.bmp", -1, 80)
+   print("выполняем треть квеста ")
+   mouse_move($_return1, $_return2)
+   WAIT(3)
+   LCLICK($_return1, $_return2)
+   WAIT(3)
+   
+   WAITMS(100)
+END_IF
+GETSCREEN
+COLORMODE(6)
+IF_PICTURE_IN (0,0, $_xmax,$_ymax, "слп.bmp", -1, 80)
+   print("пробуем забрать своё ")
+   mouse_move($_return1, $_return2)
+   WAIT(3)
+   LCLICK($_return1+110, $_return2)
+   WAIT(3)
+   
+   WAITMS(100)
+END_IF
+
+print("пока")
+
+halt
